@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:flutter_midi_command/flutter_midi_command_messages.dart';
 
+import 'main.dart';
+
+// from soundOutput
+import 'package:flutter/services.dart';
+import 'package:flutter_midi/flutter_midi.dart';
+
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
+
 class ControllerPage extends StatelessWidget {
   Future<bool> _save() {
     print('close and disconnect all');
@@ -42,8 +51,11 @@ class MidiControlsState extends State<MidiControls> {
   @override
   void initState() {
     print('init controller');
+    // this is where it reads input!
     _rxSubscription = _midiCommand.onMidiDataReceived.listen((data) {
       print('on data $data');
+      // play sound (from soundOutput, now in main)
+      _play()
       var status = data[0];
 
       if (status == 0xF8) {

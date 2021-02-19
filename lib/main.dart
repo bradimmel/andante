@@ -5,11 +5,11 @@ import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'controller.dart';
 
 // from soundOutput
-/*import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart';*/
+import 'package:flutter/foundation.dart';
 
 void main() => runApp(new MyApp());
 
@@ -22,9 +22,13 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription<String> _setupSubscription;
   MidiCommand _midiCommand = MidiCommand();
 
+  final _flutterMidi = FlutterMidi(); // from soundOutput
+
   @override
   void initState() {
     super.initState();
+
+    _flutterMidi.prepare(sf2: null); // from soundOutput
 
     _midiCommand.startScanningForBluetoothDevices().catchError((err) {
       print("Error $err");
@@ -44,6 +48,18 @@ class _MyAppState extends State<MyApp> {
       }
     });
   }
+
+// from soundOutput
+  void load(String asset) async {
+    print("Loading File...");
+    _flutterMidi.unmute();
+    ByteData _byte = await rootBundle.load(asset);
+    //assets/sf2/SmallTimGM6mb.sf2
+    //assets/sf2/Piano.SF2
+    _flutterMidi.prepare(sf2: _byte, name: _value.replaceAll("assets/", ""));
+  }
+
+  String _value = "assets/Piano.sf2";
 
   @override
   void dispose() {
@@ -107,5 +123,18 @@ class _MyAppState extends State<MyApp> {
                 })),
       ),
     );
+  }
+
+  // from soundOutput
+  void _play(int midi) {
+    if (kIsWeb) {
+      // WebMidi.play(midi);
+    } else {
+      if (_flutterMidi == null) {
+        print('badbad');
+      } else {
+        _flutterMidi.playMidiNote(midi: midi);
+      }
+    }
   }
 }
