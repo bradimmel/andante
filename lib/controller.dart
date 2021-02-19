@@ -48,14 +48,25 @@ class MidiControlsState extends State<MidiControls> {
   StreamSubscription<List<int>> _rxSubscription;
   MidiCommand _midiCommand = MidiCommand();
 
+  // from soundOutput
+  final _flutterMidi = FlutterMidi();
+
   @override
   void initState() {
+    // From soundOutput
+    print('init soundOutput');
+    load(_pianoFile);
+    // end
+
+	
     print('init controller');
     // this is where it reads input!
     _rxSubscription = _midiCommand.onMidiDataReceived.listen((data) {
       print('on data $data');
+
       // play sound (from soundOutput, now in main)
-      _play()
+      _play(60);  
+
       var status = data[0];
 
       if (status == 0xF8) {
@@ -76,6 +87,32 @@ class MidiControlsState extends State<MidiControls> {
       }
     });
     super.initState();
+  }
+
+  // load function from soundOutput
+  void load(String asset) async {
+    print("Loading File ...");
+    _flutterMidi.unmute();
+    ByteData _byte = await rootBundle.load(asset);
+    //assets/sf2/SmallTimGM6mb.sf2
+    //assets/sf2/Piano.SF2
+    _flutterMidi.prepare(sf2: _byte, name: _pianoFile.replaceAll("assets/", ""));
+  }
+
+  String _pianoFile = "assets/Piano.sf2";   // from soundOutput
+
+  // from soundOutput
+  void _play(int midi) {
+    if (kIsWeb) {
+      // WebMidi.play(midi);
+      // note from Kevin: we can probably ignore all "kIsWeb" cases
+    } else {
+      if (_flutterMidi == null) {
+        print('badbad');  // lol @ whoever wrote this print statement
+      } else {
+        _flutterMidi.playMidiNote(midi: midi);
+      }
+    }
   }
 
   void dispose() {
@@ -184,3 +221,5 @@ class SlidingSelector extends StatelessWidget {
     );
   }
 }
+
+
