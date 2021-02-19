@@ -64,7 +64,8 @@ class MidiControlsState extends State<MidiControls> {
     _rxSubscription = _midiCommand.onMidiDataReceived.listen((data) {
       print('on data $data');
 
-      // play sound (from soundOutput, now in main)
+      // play sound (from soundOutput)
+      // TODO: replace "60" with parsed data from "data"
       _play(60);  
 
       var status = data[0];
