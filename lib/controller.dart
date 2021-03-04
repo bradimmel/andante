@@ -71,6 +71,9 @@ class MidiControlsState extends State<MidiControls> {
         if (data[0] == 144) {
           _play(data[1]);
         }
+        if (data[0] == 128) {
+          _stop(data[1]);
+        }
       }
 
       var status = data[0];
@@ -106,7 +109,9 @@ class MidiControlsState extends State<MidiControls> {
         sf2: _byte, name: _pianoFile.replaceAll("assets/", ""));
   }
 
-  String _pianoFile = "assets/Piano.sf2"; // from soundOutput
+  //String _pianoFile = "assets/Piano.sf2"; // from soundOutput
+  //String _pianoFile = "assets/Andante.sf2";
+  String _pianoFile = "assets/AndanteSnareImpulseTest.sf2";
 
   // from soundOutput
   void _play(int midi) {
@@ -118,6 +123,19 @@ class MidiControlsState extends State<MidiControls> {
         print('badbad'); // lol @ whoever wrote this print statement
       } else {
         _flutterMidi.playMidiNote(midi: midi);
+      }
+    }
+  }
+
+  void _stop(int midi) {
+    if (kIsWeb) {
+      // WebMidi.play(midi);
+      // note from Kevin: we can probably ignore all "kIsWeb" cases
+    } else {
+      if (_flutterMidi == null) {
+        print('badbad'); // lol @ whoever wrote this print statement
+      } else {
+        _flutterMidi.stopMidiNote(midi: midi);
       }
     }
   }
